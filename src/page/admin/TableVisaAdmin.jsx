@@ -4,14 +4,17 @@ import MetarialTable from 'material-table'
 import axios from 'axios'
 import { API } from './../../config';
 import { isAuthenticated } from '../auth/apiAuth'
-import FormDialog from './../user/ModalRemindEdit'
+import FormDialog from './../user/ModalVisaEdit'
 import { Redirect, useHistory } from 'react-router-dom'
 import Moment from 'moment'
 import Icon from '@material-ui/core/Icon';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import BurstModeIcon from '@material-ui/icons/BurstMode';
+import FlightIcon from '@material-ui/icons/Flight';
 import { Link } from '@material-ui/core';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 
-const TableRemind = props => {
+const TableVisa = props => {
 
     const useStyles = makeStyles((theme) => ({
         cart: {
@@ -31,22 +34,29 @@ const TableRemind = props => {
     const [idEdit, setidEdit] =  useState()
     const [openPopup, setOpenPopup] = useState(false)
     const [valueEdit , setValueEdit] = useState({
-        date:"",
-        description:""
+        date: "",
+        costVisa: "",
+        costPermit: "",
+        description: ""
     })
 
     const openInPopup = (idr) => {
-        // console.log(idr)
-        axios.post(`${API}/fetchRemindUserByIdforUpdate`, {
-            idReminder: idr,
+        console.log(idr)
+        axios.post(`${API}/fetchVisaUserByIdforUpdate`, {
+            idRemindVisa: idr,
         }, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             }
         }).then(response => {
-            // console.log(response.data.results[0])
-            setValueEdit({...valueEdit, date:Moment(response.data.results[0].date).format('YYYY-MM-DD'), description:response.data.results[0].description})
+            console.log(response.data.results[0])
+            setValueEdit({
+                ...valueEdit, date: Moment(response.data.results[0].date).format('YYYY-MM-DD'),
+                description: response.data.results[0].description,
+                costVisa: response.data.results[0].costVisa,
+                costPermit: response.data.results[0].costPermit,
+            })
             setidEdit(idr)
             setOpenPopup(true)
         })
@@ -59,6 +69,8 @@ const TableRemind = props => {
         { title: 'row', field: 'row' },
         { title: 'name', field: 'name'},
         { title: 'note', field: 'description' },
+        { title: 'visa charge', field: 'costVisa' },
+        { title: 'workpermit charge', field: 'costPermit' },
         { title: 'date', field: 'date' },
         { title: '1 m ahead', field: 'noti1' },
         { title: '2 m ahead', field: 'noti2' },
@@ -68,26 +80,40 @@ const TableRemind = props => {
     ]
     const actions = [
         {
-            icon: () => <CloudDownloadIcon/>,
-            tooltip: 'save image',
-            onClick: (event, rowData) => imageDownload(rowData.imageUrl)//alert("You saved " + rowData.client)
+            icon: () => <AssignmentIndIcon/>,
+            tooltip: 'work permit',
+            onClick: (event, rowData) => imageDownload2(rowData.imageUrl2)//alert("You saved " + rowData.client)
+          },
+        {
+            icon: () => <FlightIcon/>,
+            tooltip: 'visa',
+            onClick: (event, rowData) => imageDownload(rowData.imageUrl1)//alert("You saved " + rowData.client)
           },
         {
           icon: 'edit',
           tooltip: 'Edit',
-          onClick: (event, rowData) => openInPopup(rowData.idReminder)//alert("You saved " + rowData.client)
+          onClick: (event, rowData) => openInPopup(rowData.idRemindVisa)//alert("You saved " + rowData.client)
         },
         rowData => ( {
             icon: 'delete',
             tooltip: 'Delete',
-            onClick: (event, rowData) => deleteIndex(rowData.idReminder, user.idusers)//window.confirm("You want to delete " + rowData.idworks),
+            onClick: (event, rowData) => deleteIndex(rowData.idRemindVisa, user.idusers)//window.confirm("You want to delete " + rowData.idworks),
         })
     ]
 
-    const imageDownload = (img) => {
-        console.log(img)
-        window.open(img, "_blank");
+    const imageDownload = (img1) => {
+        console.log(img1)
+        window.location.assign(img1);
     }
+
+    const imageDownload2 = (img1) => {
+        console.log(img1)
+        window.location.assign(img1);
+    }
+
+    // const idown2 = (img) => {
+    //     window.location.assign(img);
+    // }
 
     const deleteIndex = (id, user) => {
         // console.log(id)
@@ -105,22 +131,10 @@ const TableRemind = props => {
             window.location.reload(true);
         })
     }
-    // const {idworks, location,} = dataEdit
-    // const editModal = (rowData) => {
-    //     console.log(rowData)
-    //     var index = {
-    //         idworks: rowData.idworks,
-    //         client: rowData.client
-    //     }
-    //     // console.log(index)
-    //     setDataEdit(index)
-    //     // console.log(dataEdit)
-    //     openInPopup()
-    // } 
 
     const fetchWorks = () => {
-        axios.post(`${API}/fetchRemindAdmin`, {
-            idUserRemind: user.idusers,
+        axios.post(`${API}/fetchVisaAdmin`, {
+            idUserVisa: user.idusers,
         }, {
             headers: {
                 "Content-Type": "application/json",
@@ -132,17 +146,20 @@ const TableRemind = props => {
             var fetchData = []
             for (var i = 0; i < response.data.Allresult.length; i++) {
                 fetchData.push({
-                    idReminder: response.data.Allresult[i].user.idReminder,
+                    idRemindVisa: response.data.Allresult[i].user.idRemindVisa,
                     row: i + 1,
-                    name:response.data.Allresult[i].user.name,
-                    img:response.data.Allresult[i].user.img,
-                    date:response.data.Allresult[i].user.date,
-                    noti1:response.data.Allresult[i].user.noti1,
-                    noti2:response.data.Allresult[i].user.noti2,
-                    noti3:response.data.Allresult[i].user.noti3,
-                    imageUrl:response.data.Allresult[i].imageUrl,
+                    img: response.data.Allresult[i].user.img,
+                    name: response.data.Allresult[i].user.name,
+                    costVisa: response.data.Allresult[i].user.costVisa,
+                    costPermit: response.data.Allresult[i].user.costPermit,
+                    date: response.data.Allresult[i].user.date,
+                    noti1: response.data.Allresult[i].user.noti1,
+                    noti2: response.data.Allresult[i].user.noti2,
+                    noti3: response.data.Allresult[i].user.noti3,
+                    imageUrl1: response.data.Allresult[i].imageUrl1,
+                    imageUrl2: response.data.Allresult[i].imageUrl2,
                     description: response.data.Allresult[i].user.description,
-                    TimeStamp:response.data.Allresult[i].user.TimeStamp
+                    TimeStamp: response.data.Allresult[i].user.TimeStamp
                 })
             }
             setData(fetchData);
@@ -157,7 +174,7 @@ const TableRemind = props => {
         >
 
             <MetarialTable
-                title="Remind"
+                title="Visa and Workpermit"
                 style={{ padding: '1rem' }}
                 data={data}
                 columns={column}
@@ -176,10 +193,11 @@ const TableRemind = props => {
                 dataEdit={idEdit}
                 dateEdit={valueEdit.date}
                 descriptionEdit={valueEdit.description}
-                // valueE={valueEdit}
+                costVisaEdit={valueEdit.costVisa}
+                costPermitEdit={valueEdit.costPermit}
             />
         </div>
     )
 }
 
-export default TableRemind;
+export default TableVisa;

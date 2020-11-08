@@ -65,7 +65,7 @@ const FormDialog = props => {
   const token = isAuthenticated() && isAuthenticated().token;
   const { getplace, lat, long } = location;
   const { place, client, clientCode, description, expenses,
-    cost, partner, status, lattitude, longtitude, loading, successloading, error, redirectToReferrer } = values;
+    cost, partner, status, lattitude, longtitude,  successloading, error, redirectToReferrer } = values;
   const fetchPartner = () => {
     axios.post(`${API}/fetchpartner`, {}, {
       headers: {
@@ -82,7 +82,10 @@ const FormDialog = props => {
   const getLocation = () => {
     if (openPopup) {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(getCoordinate, handleLocationError)
+        navigator.geolocation.getCurrentPosition(getCoordinate, handleLocationError , {
+          enableHighAccuracy:true,
+          timeout:5000
+        })
       } else {
         alert("ไม่สามารถเช็คอินกับ browser นี้ได้")
       }

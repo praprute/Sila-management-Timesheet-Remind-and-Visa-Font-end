@@ -95,7 +95,7 @@ const FormDialog = props => {
     const loading = (load) => {
         if (load) {
             return (<Alert variant="outlined" severity="info">
-                This is an info alert — check it out!
+                Loading please wait
             </Alert>)
         } else {
 

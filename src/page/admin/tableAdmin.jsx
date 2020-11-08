@@ -49,7 +49,7 @@ const TableAdmin = props => {
                 Authorization: `Bearer ${token}`
             }
         }).then(response => {
-            // console.log(response)
+            console.log(response)
             setValues(response.data.message)
             var fetchData = []
             for (var i = 0; i < response.data.message.length; i++) {
@@ -86,6 +86,13 @@ const TableAdmin = props => {
                 style={{ padding: '1rem' }}
                 data={data}
                 columns={column}
+                // options={{
+                //     headerStyle: {
+                //       backgroundColor: 'rgb(27,36,48)',
+                //       color: '#FFF'
+                //     },
+                //     actionsColumnIndex: -1
+                //   }}
             />
         </div>
     )

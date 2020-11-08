@@ -136,7 +136,13 @@ const MiniDrawer = ({
     
   }
   const linkToVisa = () => {
-    history.push('/main')
+    if(user){
+      if(user.role == 0){
+        history.push('/visa')
+      }else{
+        history.push('/visaAdmin')
+      }
+    }
   }
 
   return (

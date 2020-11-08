@@ -38,23 +38,28 @@ const FormDialog = props => {
     const history = useHistory();
     const { openPopup, setOpenPopup } = props;
     const [values, setValues] = useState({
-        date: "",
-        description: "",
+        idRemindVisa: props.dataEdit,
+        date: props.dateEdit,
+        description: props.descriptionEdit,
         error: "",
+        costVisa: "",
+        costPermit: "",
         loading: false,
         successloading: false,
         redirectToReferrer: false,
     })
 
     const [file, setFile] = useState('');
+    const [fileStamp, setFileStamp] = useState('');
     const [filename, setFilename] = useState('Choose File');
+    const [filenameStamp, setFilenameStamp] = useState('Choose File');
 
     const user = isAuthenticated() && isAuthenticated().user;
     const token = isAuthenticated() && isAuthenticated().token;
 
-    const { description, successloading, error, redirectToReferrer } = values;
+    const { idReminder, description, costVisa, costPermit, successloading, error, redirectToReferrer } = values;
 
-    const [notidate, setDate]   = React.useState(Moment(new Date()).format('YYYY-MM-DD'));
+    const [notidate, setDate] = React.useState(Moment(new Date()).format('YYYY-MM-DD'));
     const [notidate1, setDate1] = React.useState(Moment(new Date()).format('YYYY-MM-DD'));
     const [notidate2, setDate2] = React.useState(Moment(new Date()).format('YYYY-MM-DD'));
     const [notidate3, setDate3] = React.useState(Moment(new Date()).format('YYYY-MM-DD'));
@@ -75,14 +80,28 @@ const FormDialog = props => {
     }
 
     useEffect(() => {
-
-    }, []);
+        setDate(props.dateEdit)
+        setValues({
+            ...values,
+            idRemindVisa: props.dataEdit,
+            date: props.dateEdit,
+            description: props.descriptionEdit,
+            costVisa:props.costVisaEdit,
+            costPermit:props.costPermitEdit,
+        })
+    }, [props]);
 
 
     const onChangeImage = e => {
         setFile(e.target.files[0]);
         setFilename(e.target.files[0].name);
     }
+
+    const onChangeImage2 = e => {
+        setFileStamp(e.target.files[0]);
+        setFilenameStamp(e.target.files[0].name);
+    }
+
 
     const loading = (load) => {
         if (load) {
@@ -94,36 +113,42 @@ const FormDialog = props => {
         }
     }
 
-    const onSubmit = async event => {
+    const onSubmit = event => {
         event.preventDefault();
         setValues({ ...values, loading: true })
         let formData = new FormData();
-        formData.append('file', file)
-        formData.append('idUserRemind', user.idusers)
+        formData.append('idRemindVisa', values.idRemindVisa)
+        formData.append('file1', file)
+        formData.append('file2', fileStamp) 
+        formData.append('idUserVisa', user.idusers)
         formData.append('notidate', notidate)
         formData.append('description', values.description)
+        formData.append('costVisa', values.costVisa)
+        formData.append('costPermit', values.costPermit)
         formData.append('notidate1', notidate1)
         formData.append('notidate2', notidate2)
         formData.append('notidate3', notidate3)
-        await axios.post(`${API}/uploadReminder`, 
+        axios.post(`${API}/updateVisa`,
             formData,
-        {
-            headers: {
-                "Content-Type": 'multipart/form-data',
-                Authorization: `Bearer ${token}`
-            }
-        }).then(response => {
-            setOpenPopup(false)
-            setValues({ ...values, loading: false, redirectToReferrer: true })
-            window.location.reload(true);
-        })
+            {
+                headers: {
+                    "Content-Type": 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                }
+            }).then(response => {
+                if (response) {
+                    setValues({ ...values, loading: false, redirectToReferrer: true })
+                    setOpenPopup(false)
+                    window.location.reload(true);
+                }
+            })
     }
 
     return (
         <div
             {...props}>
             <Dialog open={openPopup} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Reminder</DialogTitle>
+                <DialogTitle id="form-dialog-title">Edit Visa</DialogTitle>
                 {loading(values.loading)}
                 <DialogContent>
                     <Grid container spacing={18} component="main">
@@ -135,7 +160,7 @@ const FormDialog = props => {
                                 label={filename}
                                 disabled
                                 fullWidth
-                                onChange={handleChange('client')}
+                            // onChange={handleChange('client')}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -153,7 +178,39 @@ const FormDialog = props => {
                                     className={classes.button}
                                     startIcon={<CloudUploadIcon />}
                                     fullWidth
-                                    // type="file"
+                                    component="span"
+                                >
+                                    Upload Image
+                                </Button>
+
+                            </label>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                margin="dense"
+                                id="image2"
+                                label={filenameStamp}
+                                disabled
+                                fullWidth
+                            // onChange={handleChange('client')}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <label htmlFor="upload-photo2">
+                                <input
+                                    style={{ display: 'none' }}
+                                    id="upload-photo2"
+                                    name="upload-photo2"
+                                    type="file"
+                                    onChange={onChangeImage2}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="default"
+                                    className={classes.button}
+                                    startIcon={<CloudUploadIcon />}
+                                    fullWidth
                                     component="span"
                                 >
                                     Upload Image
@@ -177,6 +234,28 @@ const FormDialog = props => {
                                 />
                             </MuiPickersUtilsProvider>
                         </Grid>
+                        <TextField
+                            margin="dense"
+                            id="name"
+                            label="visa sevices charge"
+                            // multiline
+                            // rows={4}
+                            type="number"
+                            fullWidth
+                            value={costVisa}
+                            onChange={handleChange('costVisa')}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="name"
+                            label="work permit sevices charge"
+                            // multiline
+                            // rows={4}
+                            type="number"
+                            fullWidth
+                            value={costPermit}
+                            onChange={handleChange('costPermit')}
+                        />
                         <TextField
                             margin="dense"
                             id="name"

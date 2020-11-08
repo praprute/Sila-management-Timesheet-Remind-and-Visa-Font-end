@@ -115,7 +115,13 @@ const ButtonAppBar = ({
     
   }
   const linkToVisa = () => {
-    history.push('/officer')
+    if(user){
+      if(user.role == 0){
+        history.push('/visa')
+      }else{
+        history.push('/visaAdmin')
+      }
+    }
   }
 
   const list = (anchor) => (
@@ -134,7 +140,7 @@ const ButtonAppBar = ({
         </IconButton>
       </div>
 
-      <List>
+      <List onClick={linkTotimeSheet}>
         <ListItem button>
           <ListItemIcon>
             <AccessTimeIcon onClick={linkTotimeSheet} style={{ color: grey[50] }} />
@@ -143,7 +149,7 @@ const ButtonAppBar = ({
         </ListItem>
       </List>
 
-      <List>
+      <List onClick={linkToReminder}>
         <ListItem button>
           <ListItemIcon>
             <DateRangeIcon onClick={linkToReminder} style={{ color: grey[50] }} />
@@ -153,7 +159,7 @@ const ButtonAppBar = ({
       </List>
       
    
-      <List>
+      <List onClick={linkToVisa}>
         <ListItem button>
           <ListItemIcon>
             <FlightTakeoffIcon onClick={linkToVisa}  style={{ color: grey[50] }} />

@@ -147,8 +147,12 @@ const TableUser = props => {
                 columns={column}
                 actions={actions}
                 options={{
+                    // headerStyle: {
+                    //   backgroundColor: 'rgb(27,36,48)',
+                    //   color: '#FFF'
+                    // },
                     actionsColumnIndex: -1
-                }}
+                  }}
             />
             <FormDialog openPopup={openPopup}
                 setOpenPopup={setOpenPopup}
